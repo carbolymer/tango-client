@@ -4,6 +4,9 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoDs.Except;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Calendar;
 
 
@@ -12,13 +15,16 @@ import java.util.Calendar;
  * @since 04.11.13
  */
 public class Client {
-  Thermometer thermometer = null;
-  Interface iface = null;
+  Thermometer thermometer = Thermometer.getInstance();
+  Interface iface = Interface.draw();
+
+  ButtonSwitchActionListener listener = null;
 
   public static void main(String[] args) {
     System.out.println("TERMOMETR");
     try {
       Client client = new Client();
+      client.updateButton();
       while(true) {
         client.fillPlot();
         Thread.sleep(500);
@@ -31,19 +37,36 @@ public class Client {
   }
 
   public Client() throws DevFailed {
-    thermometer = Thermometer.getInstance();
-    iface = Interface.draw();
+
   }
 
   public void fillPlot() throws DevFailed {
     Temperature temperature;
-    if(thermometer.getState() == DevState.ON) {
-      temperature = thermometer.getTemperature();
-      iface.getData().add(time(),temperature.getValue());
-    } else
-    {
-      iface.getData().add(time(),null);
+    try {
+      listener.setApropiateStatus();
+      if (thermometer.getState() == DevState.ON) {
+        temperature = thermometer.getTemperature();
+        iface.getData().add(time(), temperature.getValue());
+      } else {
+        iface.getData().add(time(), null);
+      }
+    } catch (DevFailed e) {
+      ;
     }
+  }
+
+  public void updateButton() throws DevFailed {
+    JButton button = iface.getSwitchButton();
+    if(thermometer.getState() == DevState.ON) {
+      button.setText("Wyłącz");
+    } else {
+      button.setText("Włącz");
+    }
+
+    listener = new ButtonSwitchActionListener();
+    listener.setButton(button);
+    listener.setText(iface.getText());
+    button.addActionListener(listener);
   }
 
   public static long time() {

@@ -30,8 +30,9 @@ public class Thermometer {
   }
 
   public Temperature getTemperature() throws DevFailed {
-    DeviceAttribute attribute = device.read_attribute("temperature");
     Temperature temperature =  new Temperature();
+    DeviceAttribute attribute;
+    attribute = device.read_attribute("temperature");
     temperature.setTimestamp(attribute.getTimeValSec());
     temperature.setValue(attribute.extractDouble());
     return temperature;
