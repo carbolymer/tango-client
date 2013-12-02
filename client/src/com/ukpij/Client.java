@@ -6,7 +6,6 @@ import fr.esrf.TangoDs.Except;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Calendar;
 
 
@@ -15,15 +14,17 @@ import java.util.Calendar;
  * @since 04.11.13
  */
 public class Client {
+  private static Client instance = null;
   Thermometer thermometer = Thermometer.getInstance();
   Interface iface = Interface.draw();
 
-  ButtonSwitchActionListener listener = null;
+  ButtonSwitchActionListener buttonListener = null;
+
+  ComboBoxActionListener comboListener = null;
 
   public static void main(String[] args) {
-    System.out.println("TERMOMETR");
     try {
-      Client client = new Client();
+      Client client = Client.getInstance();
       client.updateButton();
       while(true) {
         client.fillPlot();
@@ -36,14 +37,21 @@ public class Client {
     }
   }
 
-  public Client() throws DevFailed {
+  public static Client getInstance() throws DevFailed {
+    if(!(instance instanceof  Client)) {
+      instance = new Client();
+    }
+    return instance;
+  }
 
+  private Client() throws DevFailed {
   }
 
   public void fillPlot() throws DevFailed {
+    // w zaleznosci od wartosci refreshmode albo odczyt z bazy, albo z tango
     Temperature temperature;
     try {
-      listener.setApropiateStatus();
+      buttonListener.setApropiateStatus();
       if (thermometer.getState() == DevState.ON) {
         temperature = thermometer.getTemperature();
         iface.getData().add(time(), temperature.getValue());
@@ -57,16 +65,23 @@ public class Client {
 
   public void updateButton() throws DevFailed {
     JButton button = iface.getSwitchButton();
+    JComboBox refreshMode = iface.getRefreshModeCombo();
     if(thermometer.getState() == DevState.ON) {
       button.setText("Wyłącz");
     } else {
       button.setText("Włącz");
     }
 
-    listener = new ButtonSwitchActionListener();
-    listener.setButton(button);
-    listener.setText(iface.getText());
-    button.addActionListener(listener);
+    iface.getDateFrom().disable(true);
+    iface.getDateTo().disable(true);
+
+    comboListener = new ComboBoxActionListener(iface.getDateFrom(),iface.getDateTo());
+    refreshMode.addActionListener(comboListener);
+
+    buttonListener = new ButtonSwitchActionListener();
+    buttonListener.setButton(button);
+    buttonListener.setText(iface.getText());
+    button.addActionListener(buttonListener);
   }
 
   public static long time() {
