@@ -1,7 +1,10 @@
-package com.ukpij;
+package com.ukpij.gui;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -42,6 +45,10 @@ public class DatePicker extends JPanel {
     spinner.setEnabled(!value);
   }
 
+  public void addSpinnerListener(ChangeListener changeListener) {
+    spinner.addChangeListener(changeListener);
+  }
+
   static protected JSpinner addLabeledSpinner(Container c,
                                               String label,
                                               SpinnerModel model) {
@@ -53,5 +60,9 @@ public class DatePicker extends JPanel {
     c.add(spinner);
 
     return spinner;
+  }
+
+  public Date getDate() {
+    return (Date) spinner.getValue();
   }
 }

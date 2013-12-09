@@ -1,4 +1,4 @@
-package com.ukpij;
+package com.ukpij.gui;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -85,8 +85,8 @@ public class Interface extends ApplicationFrame {
     pane.add(getRefreshModeCombo(),c);
 
     text.setFont(text.getFont().deriveFont(64.0f));
-    setSize(1000, 800);
-    setMinimumSize(new Dimension(1000,800));
+    setSize(1080, 800);
+    setMinimumSize(new Dimension(1080,800));
   }
 
   public static Interface draw() {

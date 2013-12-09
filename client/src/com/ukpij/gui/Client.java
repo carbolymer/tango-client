@@ -1,12 +1,15 @@
-package com.ukpij;
+package com.ukpij.gui;
 
+import com.ukpij.DAO;
+import com.ukpij.Temperature;
+import com.ukpij.Thermometer;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoDs.Except;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -21,6 +24,10 @@ public class Client {
   ButtonSwitchActionListener buttonListener = null;
 
   ComboBoxActionListener comboListener = null;
+
+  SpinnerListener spinnerListener = null;
+
+  DAO dao = null;
 
   public static void main(String[] args) {
     try {
@@ -45,11 +52,15 @@ public class Client {
   }
 
   private Client() throws DevFailed {
+    dao = new DAO();
   }
 
   public void fillPlot() throws DevFailed {
-    // w zaleznosci od wartosci refreshmode albo odczyt z bazy, albo z tango
     Temperature temperature;
+    // w zaleznosci od wartosci refreshmode albo odczyt z bazy, albo z tango
+    if( iface.getRefreshModeCombo().getSelectedIndex() == 1) {
+      return; // nie ma po co odswierzac, skoro jest wybrany zakres dat
+    }
     try {
       buttonListener.setApropiateStatus();
       if (thermometer.getState() == DevState.ON) {
@@ -63,6 +74,11 @@ public class Client {
     }
   }
 
+  public void fillPlotFromHistory(Date startDate, Date endDate) {
+    Temperature[] temperatures = dao.getTemperatures(startDate,endDate);
+   // todo wypelnianie JFRECHART
+  }
+
   public void updateButton() throws DevFailed {
     JButton button = iface.getSwitchButton();
     JComboBox refreshMode = iface.getRefreshModeCombo();
@@ -72,8 +88,11 @@ public class Client {
       button.setText("Włącz");
     }
 
+    spinnerListener = new SpinnerListener(iface.getDateFrom(),iface.getDateTo());
     iface.getDateFrom().disable(true);
+    iface.getDateFrom().addSpinnerListener(spinnerListener);
     iface.getDateTo().disable(true);
+    iface.getDateTo().addSpinnerListener(spinnerListener);
 
     comboListener = new ComboBoxActionListener(iface.getDateFrom(),iface.getDateTo());
     refreshMode.addActionListener(comboListener);

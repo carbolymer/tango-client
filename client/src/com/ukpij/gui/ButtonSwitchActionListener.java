@@ -1,5 +1,6 @@
-package com.ukpij;
+package com.ukpij.gui;
 
+import com.ukpij.Thermometer;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 

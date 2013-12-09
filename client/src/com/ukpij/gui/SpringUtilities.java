@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.ukpij;
+package com.ukpij.gui;
 
 import javax.swing.*;
 import javax.swing.SpringLayout;
