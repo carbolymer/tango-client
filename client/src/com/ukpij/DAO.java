@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -27,22 +28,32 @@ public class DAO {
     }
   }
 
-  public Temperature[] getTemperatures(Date startDate, Date endDate) {
-    Temperature[] temperatures;
+  public ArrayList<Temperature> getTemperatures(Date startDate, Date endDate) {
+    ArrayList<Temperature> temperatures = new ArrayList<>();
     int i = 0;
+    PreparedStatement statement = null;
     try {
-      PreparedStatement statement = connection.prepareStatement("SELECT * FROM `values` WHERE timestamp > ? AND timestamp < ?");
-      statement.setLong(1,startDate.getTime());
+      statement = connection.prepareStatement("SELECT * FROM `values` WHERE timestamp > ? AND timestamp < ?");
+//      System.out.println("SELECT * FROM `values` WHERE timestamp > " + startDate.getTime() + " AND timestamp < " + endDate.getTime());
+      statement.setLong(1, startDate.getTime());
       statement.setLong(2, endDate.getTime());
       ResultSet resultSet = statement.executeQuery();
-      temperatures = new Temperature[resultSet.getFetchSize()];
-      while(resultSet.next()) {
-        temperatures[i].setTimestamp(resultSet.getLong("timestamp"));
-        temperatures[i++].setValue(resultSet.getDouble("temperature"));
+      while (resultSet.next()) {
+        temperatures.add(new Temperature());
+        temperatures.get(i).setTimestamp(resultSet.getLong("timestamp"));
+        temperatures.get(i++).setValue(resultSet.getDouble("temperature"));
       }
       return temperatures;
     } catch (SQLException e) {
       e.printStackTrace();
+    } finally {
+      if (statement != null) {
+        try {
+          statement.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
     }
     return null;
   }

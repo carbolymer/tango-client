@@ -6,8 +6,11 @@ import com.ukpij.Thermometer;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoDs.Except;
+import org.jfree.data.time.Millisecond;
+import org.jfree.data.time.TimeSeries;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -65,9 +68,9 @@ public class Client {
       buttonListener.setApropiateStatus();
       if (thermometer.getState() == DevState.ON) {
         temperature = thermometer.getTemperature();
-        iface.getData().add(time(), temperature.getValue());
+        iface.getData().add(new Millisecond(date()), temperature.getValue());
       } else {
-        iface.getData().add(time(), null);
+        iface.getData().add(new Millisecond(date()), null);
       }
     } catch (DevFailed e) {
       ;
@@ -75,8 +78,12 @@ public class Client {
   }
 
   public void fillPlotFromHistory(Date startDate, Date endDate) {
-    Temperature[] temperatures = dao.getTemperatures(startDate,endDate);
-   // todo wypelnianie JFRECHART
+    ArrayList<Temperature> temperatures = dao.getTemperatures(startDate,endDate);
+    TimeSeries data = iface.getData();
+    data.clear();
+    for( int i = 0; i < temperatures.size() ; ++i) {
+      data.add(new Millisecond(temperatures.get(i).getDate()), temperatures.get(i).getValue());
+    }
   }
 
   public void updateButton() throws DevFailed {
@@ -103,7 +110,11 @@ public class Client {
     button.addActionListener(buttonListener);
   }
 
-  public static long time() {
-    return Calendar.getInstance().getTime().getTime();
+//  public static long time() {
+//    return Calendar.getInstance().getTime().getTime();
+//  }
+
+  public static Date date() {
+    return Calendar.getInstance().getTime();
   }
 }

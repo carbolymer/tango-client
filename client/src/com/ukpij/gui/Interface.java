@@ -3,7 +3,12 @@ package com.ukpij.gui;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
@@ -11,6 +16,11 @@ import org.jfree.ui.RefineryUtilities;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Mateusz Gałażyn <mateusz.galazyn@gmail.com>
@@ -18,7 +28,7 @@ import java.awt.*;
  */
 public class Interface extends ApplicationFrame {
 
-  private XYSeries rawData = new XYSeries("Temperatura CPU");
+  private TimeSeries rawData = new TimeSeries("Temperatura CPU");
 
   private JButton switchButton = new JButton();
 
@@ -35,8 +45,8 @@ public class Interface extends ApplicationFrame {
   private Interface() {
 
     super("Temperatura CPU");
-    final XYSeriesCollection data = new XYSeriesCollection(rawData);
-    final JFreeChart chart = ChartFactory.createXYLineChart(
+    final TimeSeriesCollection data = new TimeSeriesCollection(rawData);
+    JFreeChart chart = ChartFactory.createXYLineChart(
         "Temperatura CPU",
         "Czas [s]",
         "Temperatura [C]",
@@ -46,6 +56,9 @@ public class Interface extends ApplicationFrame {
         true,
         false
     );
+    DateAxis dateAxis = new DateAxis();
+    dateAxis.setDateFormatOverride(new SimpleDateFormat("dd-MM HH:mm:ss"));
+    chart.getXYPlot().setDomainAxis(dateAxis);
 
     final ChartPanel chartPanel = new ChartPanel(chart);
     chartPanel.setPreferredSize(new java.awt.Dimension(1000, 750));
@@ -103,11 +116,11 @@ public class Interface extends ApplicationFrame {
     return getRefreshModeCombo();
   }
 
-  public XYSeries getData() {
+  public TimeSeries getData() {
     return rawData;
   }
 
-  public void setData(XYSeries data) {
+  public void setData(TimeSeries data) {
     this.rawData = data;
   }
 

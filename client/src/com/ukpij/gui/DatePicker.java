@@ -30,7 +30,7 @@ public class DatePicker extends JPanel {
         latestDate,
         Calendar.YEAR);//ignored for user input
     spinner = addLabeledSpinner(this, label, dateModel);
-    spinner.setEditor(new JSpinner.DateEditor(spinner, "hh:mm:ss dd-MM-yyyy"));
+    spinner.setEditor(new JSpinner.DateEditor(spinner, "dd-MM-yyyy HH:mm:ss"));
 
     spinner.getValue().toString();
 

@@ -33,7 +33,7 @@ public class Thermometer {
     Temperature temperature =  new Temperature();
     DeviceAttribute attribute;
     attribute = device.read_attribute("temperature");
-    temperature.setTimestamp(attribute.getTimeValSec());
+    temperature.setTimestamp(attribute.getTime());
     temperature.setValue(attribute.extractDouble());
     return temperature;
   }
